@@ -52,7 +52,7 @@ CUSTOMER_ID="63f582f6-e008-4153-8f65-3cb69bddbd3a" crewai run
 ## Project Structure
 
 ```
-frauddetect_flow/
+fraud_detection_crew/
 ├── src/frauddetect_crew/
 │   ├── main.py          # Entry point (run function)
 │   ├── crew.py          # @CrewBase crew definition

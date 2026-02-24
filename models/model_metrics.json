@@ -1,0 +1,27 @@
+{
+  "accuracy": 0.9799,
+  "f1_score": 0.9779,
+  "precision": 0.9803,
+  "recall": 0.9799,
+  "model_type": "RandomForest",
+  "best_params": {
+    "max_depth": null,
+    "min_samples_split": 2,
+    "n_estimators": 100
+  },
+  "total_samples": 2740,
+  "train_samples": 2192,
+  "test_samples": 548,
+  "top_features": {
+    "Transaction_Amount": 0.0706,
+    "Account_Balance": 0.044,
+    "Transaction_Currency_INR": 0.0266,
+    "Merchant_Category_Unknown Merchant": 0.0198,
+    "Transaction_Device_Unknown Mobile Device": 0.018,
+    "Merchant_Category_Digital Services": 0.0143,
+    "Transaction_Time_09:09:04": 0.0078,
+    "Transaction_Date_01-07-2025": 0.0076,
+    "Transaction_Time_12:15:53": 0.0061,
+    "Customer_Email_pii_email_a41f5a907a18": 0.0058
+  }
+}

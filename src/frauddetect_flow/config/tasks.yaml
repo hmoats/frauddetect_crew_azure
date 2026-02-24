@@ -1,0 +1,24 @@
+evaluate_transaction:
+  description: >
+    Evaluate customer {customer_id} for fraud.
+
+    Steps:
+    1. Use the transaction_lookup tool to retrieve the customer's transaction record.
+    2. Take the full record JSON returned by the lookup and pass it to the
+       fraud_model_scorer tool to get the model's prediction and risk score.
+    3. Analyze the model output together with the transaction details (amount,
+       merchant category, device, account balance, time of day) to form your verdict.
+    4. Return a structured FraudVerdict with:
+       - customer_id: the Customer_ID
+       - verdict: "FRAUD" or "APPROVED"
+       - risk_score: the model's fraud probability (0.0 to 1.0)
+       - explanation: 2-3 sentences explaining your reasoning, referencing specific
+         transaction attributes and the model score
+       - transaction_id, transaction_amount, merchant_category, transaction_type,
+         account_balance, city, device_type from the record
+
+    IMPORTANT: Use the REAL data from the tools. Do NOT fabricate any values.
+  expected_output: >
+    A structured FraudVerdict object containing the verdict (FRAUD or APPROVED),
+    risk score, a brief explanation, and key transaction fields.
+  agent: fraud_analyst

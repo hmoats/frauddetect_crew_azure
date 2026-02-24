@@ -9,8 +9,8 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
-from frauddetect_flow.tools.transaction_lookup_tool import TransactionLookupTool
-from frauddetect_flow.tools.model_scoring_tool import ModelScoringTool
+from frauddetect_crew.tools.transaction_lookup_tool import TransactionLookupTool
+from frauddetect_crew.tools.model_scoring_tool import ModelScoringTool
 
 
 class TestTransactionLookupTool:

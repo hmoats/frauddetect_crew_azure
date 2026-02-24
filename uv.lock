@@ -748,8 +748,8 @@ wheels = [
 ]
 
 [[package]]
-name = "frauddetect-flow"
-version = "0.2.0"
+name = "frauddetect-crew"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "crewai", extra = ["litellm", "tools"] },

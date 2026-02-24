@@ -53,13 +53,13 @@ CUSTOMER_ID="63f582f6-e008-4153-8f65-3cb69bddbd3a" crewai run
 
 ```
 frauddetect_flow/
-├── src/frauddetect_flow/
+├── src/frauddetect_crew/
 │   ├── main.py          # Entry point (run function)
 │   ├── crew.py          # @CrewBase crew definition
 │   ├── state.py         # FraudVerdict Pydantic output model
 │   ├── config/
-│   │   ├── agents.yaml  # Agent role, goal, backstory
-│   │   └── tasks.yaml   # Task description + expected output
+│   │   ├── agents.yaml  # Agent roles, goals, backstories
+│   │   └── tasks.yaml   # Task descriptions + expected outputs
 │   └── tools/
 │       ├── transaction_lookup_tool.py  # CSV customer lookup
 │       └── model_scoring_tool.py       # Model predict + score

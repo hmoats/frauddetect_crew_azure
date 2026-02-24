@@ -1,6 +1,6 @@
 [project]
-name = "frauddetect_flow"
-version = "0.2.0"
+name = "frauddetect_crew"
+version = "0.3.0"
 description = "Single-transaction fraud detection crew powered by CrewAI"
 authors = [{ name = "Your Name", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
@@ -14,8 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-run_crew = "frauddetect_flow.main:run"
-train_model = "frauddetect_flow.scripts.train_model:main"
+run_crew = "frauddetect_crew.main:run"
 
 [build-system]
 requires = ["hatchling"]

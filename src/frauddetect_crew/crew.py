@@ -4,9 +4,9 @@ from crewai import Agent, Crew, Process, Task, LLM
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai.project import CrewBase, agent, crew, task
 
-from frauddetect_flow.state import FraudVerdict
-from frauddetect_flow.tools.model_scoring_tool import ModelScoringTool
-from frauddetect_flow.tools.transaction_lookup_tool import TransactionLookupTool
+from frauddetect_crew.state import FraudVerdict
+from frauddetect_crew.tools.model_scoring_tool import ModelScoringTool
+from frauddetect_crew.tools.transaction_lookup_tool import TransactionLookupTool
 
 
 @CrewBase

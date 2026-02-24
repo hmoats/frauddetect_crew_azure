@@ -1,7 +1,7 @@
 """Smoke tests for the crew configuration."""
 
-from frauddetect_flow.crew import FraudDetectCrew
-from frauddetect_flow.state import FraudVerdict
+from frauddetect_crew.crew import FraudDetectCrew
+from frauddetect_crew.state import FraudVerdict
 
 
 def test_crew_instantiation():

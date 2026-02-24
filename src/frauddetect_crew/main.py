@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Fraud detection crew -- single-transaction evaluation.
 
-Accepts a customer_id, looks up the transaction, scores it against a
-pre-trained model, and returns a FRAUD / APPROVED verdict.
+Accepts a customer_id, looks up the transaction, scores it against
+a pre-trained model, and returns a FRAUD / APPROVED verdict.
 """
 
 import os
@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from frauddetect_flow.crew import FraudDetectCrew
+from frauddetect_crew.crew import FraudDetectCrew
 
 
 def run():

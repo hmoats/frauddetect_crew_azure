@@ -8,17 +8,41 @@ evaluate_transaction:
        fraud_model_scorer tool to get the model's prediction and risk score.
     3. Analyze the model output together with the transaction details (amount,
        merchant category, device, account balance, time of day) to form your verdict.
-    4. Return a structured FraudVerdict with:
-       - customer_id: the Customer_ID
-       - verdict: "FRAUD" or "APPROVED"
-       - risk_score: the model's fraud probability (0.0 to 1.0)
-       - explanation: 2-3 sentences explaining your reasoning, referencing specific
-         transaction attributes and the model score
-       - transaction_id, transaction_amount, merchant_category, transaction_type,
-         account_balance, city, device_type from the record
+    4. Return your analysis including:
+       - The full transaction record fields
+       - The model's risk score and predicted label
+       - Your preliminary verdict (FRAUD or APPROVED) with reasoning
 
     IMPORTANT: Use the REAL data from the tools. Do NOT fabricate any values.
   expected_output: >
-    A structured FraudVerdict object containing the verdict (FRAUD or APPROVED),
-    risk score, a brief explanation, and key transaction fields.
+    A detailed analysis containing the transaction record fields, the model risk
+    score, predicted label, and a preliminary FRAUD or APPROVED verdict with
+    evidence-based reasoning.
   agent: fraud_analyst
+
+validate_verdict:
+  description: >
+    Review the fraud analyst's evaluation and produce the final verdict.
+
+    You have access to the same tools. Use them to independently verify the
+    transaction data and model score if anything looks inconsistent.
+
+    Check the following:
+    1. Does the verdict (FRAUD/APPROVED) align with the risk score? A score above
+       0.5 should generally be FRAUD; below 0.5 should generally be APPROVED.
+    2. Does the explanation reference real transaction attributes (amount, merchant,
+       device, balance) and not generic boilerplate?
+    3. Were any obvious red flags missed (e.g. zero account balance, unknown merchant,
+       amount far exceeding balance, unusual time of day)?
+    4. Are all required fields populated with real values from the record?
+
+    If the analyst's verdict is sound, confirm it. If it needs correction, fix
+    the verdict, risk score reasoning, or explanation and explain what you changed.
+
+    Return the final structured FraudVerdict.
+  expected_output: >
+    A structured FraudVerdict with customer_id, verdict (FRAUD or APPROVED),
+    risk_score, explanation, and key transaction fields.
+  agent: verdict_validator
+  context:
+    - evaluate_transaction

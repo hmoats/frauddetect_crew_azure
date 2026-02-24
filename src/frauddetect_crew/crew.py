@@ -2,8 +2,13 @@ from typing import List
 
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.agents.agent_builder.base_agent import BaseAgent
+from crewai.knowledge.source.text_file_knowledge_source import TextFileKnowledgeSource
 from crewai.project import CrewBase, agent, crew, task
 
+from frauddetect_crew.guardrails import (
+    validate_required_fields,
+    validate_verdict_risk_alignment,
+)
 from frauddetect_crew.state import FraudVerdict
 from frauddetect_crew.tools.model_scoring_tool import ModelScoringTool
 from frauddetect_crew.tools.transaction_lookup_tool import TransactionLookupTool
@@ -54,14 +59,29 @@ class FraudDetectCrew:
         return Task(
             config=self.tasks_config["validate_verdict"],  # type: ignore[index]
             output_pydantic=FraudVerdict,
+            guardrails=[
+                validate_required_fields,
+                validate_verdict_risk_alignment,
+            ],
+            guardrail_max_retries=3,
         )
 
     @crew
     def crew(self) -> Crew:
         """Creates the Fraud Detection Crew."""
+        fraud_policy = TextFileKnowledgeSource(
+            file_paths=["fraud_policy.txt"],
+        )
+
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
+            memory=True,
+            knowledge_sources=[fraud_policy],
+            embedder={
+                "provider": "openai",
+                "config": {"model_name": "text-embedding-3-small"},
+            },
         )

@@ -6,10 +6,7 @@ import pandas as pd
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
-DATA_DIR = os.path.join(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")),
-    "data",
-)
+from frauddetect_crew.paths import DATA_DIR
 
 
 class TransactionLookupInput(BaseModel):

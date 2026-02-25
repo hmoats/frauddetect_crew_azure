@@ -753,7 +753,6 @@ version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "crewai", extra = ["litellm", "tools"] },
-    { name = "crewai-tools" },
     { name = "joblib" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "pandas", version = "3.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -769,8 +768,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "crewai", extras = ["litellm", "tools"], specifier = ">=1.9.0" },
-    { name = "crewai-tools", specifier = ">=1.9.0" },
+    { name = "crewai", extras = ["litellm", "tools"], specifier = "==1.9.3" },
     { name = "joblib", specifier = ">=1.3.0" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "python-dotenv", specifier = ">=1.0.0" },

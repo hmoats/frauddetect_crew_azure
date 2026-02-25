@@ -1,0 +1,92 @@
+ACME FINANCIAL — FRAUD DETECTION POLICY & INVESTIGATION GUIDELINES
+====================================================================
+Document ID: FP-2025-003
+Effective Date: 1 January 2025
+Classification: Internal — Fraud Operations
+
+1. RISK SCORE INTERPRETATION
+-----------------------------
+The machine-learning model outputs a probability score between 0.0 and 1.0.
+Agents must apply the following thresholds when forming a verdict:
+
+  - Score 0.00 – 0.30  →  LOW RISK. Approve unless other red flags are present.
+  - Score 0.31 – 0.50  →  MODERATE RISK. Approve with a note; flag for
+    periodic review if the customer has prior alerts.
+  - Score 0.51 – 0.75  →  ELEVATED RISK. Default to FRAUD unless the analyst
+    can document a clear legitimate explanation.
+  - Score 0.76 – 1.00  →  HIGH RISK. Treat as FRAUD. Escalate to the senior
+    fraud team for manual investigation within 24 hours.
+
+An analyst may override the model's recommendation only when the transaction
+context provides compelling evidence. Every override must include a written
+justification referencing specific transaction attributes.
+
+2. RED FLAG INDICATORS
+-----------------------
+The following patterns must always be called out in the explanation, whether
+or not the model flagged them:
+
+  a) Zero account balance at time of transaction.
+  b) Transaction amount exceeding 80 % of the account balance.
+  c) Unknown Merchant or merchant category marked "Unknown Merchant."
+  d) Transaction occurring between 00:00 and 05:00 local time.
+  e) Device type reported as "nan" or "Unknown Mobile Device."
+  f) Mismatch between transaction location and customer home city/state.
+  g) Multiple transactions from the same customer within a 5-minute window.
+  h) Transaction description inconsistent with merchant category
+     (e.g., "Bitcoin transaction" under "Clothing").
+
+If two or more red flags co-occur, the verdict should be FRAUD regardless
+of the model score.
+
+3. VERDICT FORMAT REQUIREMENTS
+-------------------------------
+Every verdict returned to downstream systems must include:
+
+  - customer_id        (string, must match the input)
+  - verdict            (exactly "FRAUD" or "APPROVED", no other values)
+  - risk_score         (float, 0.0–1.0, taken from the model output)
+  - explanation        (2–3 sentences referencing real transaction attributes)
+  - transaction_id     (string, from the record)
+  - transaction_amount (float, from the record)
+  - merchant_category  (string, from the record)
+  - transaction_type   (string, from the record — Debit, Credit, etc.)
+  - account_balance    (float, from the record)
+  - city               (string, customer city)
+  - device_type        (string, from the record)
+
+Do NOT fabricate or assume any field value. If a field is missing from the
+source record, use an empty string for text fields and 0.0 for numeric fields,
+and note the missing data in the explanation.
+
+4. ESCALATION RULES
+---------------------
+  - Any transaction above ₹100,000 with a risk score ≥ 0.51 must be
+    flagged for manual review by the senior fraud team.
+  - Any customer with three or more FRAUD verdicts in a 30-day window
+    must trigger an account-level review.
+  - Transactions involving cryptocurrency keywords ("Bitcoin", "crypto",
+    "NFT", "wallet top-up") require additional scrutiny regardless of
+    the model score.
+
+5. DATA HANDLING & PRIVACY
+----------------------------
+  - Never include raw PII (full name, email, phone number) in the
+    explanation field. Reference the customer by customer_id only.
+  - Transaction records must not be stored beyond the analysis session
+    unless required for regulatory audit.
+  - All verdict outputs are classified as Confidential and must be
+    transmitted over encrypted channels only.
+
+6. MODEL LIMITATIONS & ANALYST RESPONSIBILITY
+-----------------------------------------------
+The pre-trained model was built on historical transaction data and may not
+account for:
+  - Emerging fraud patterns not present in the training set.
+  - Regional spending patterns that differ from the training distribution.
+  - Seasonal spikes (e.g., festival-season purchases) that may resemble
+    anomalous behaviour.
+
+Analysts are expected to apply professional judgment. The model is a
+decision-support tool, not a decision-maker. The analyst's verdict is
+the authoritative output.

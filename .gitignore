@@ -14,14 +14,11 @@ myenv/
 *.egg-info/
 dist/
 build/
-*.pkl
 *.png
 *.txt
 !requirements.txt
 !README.md
-!models/
-!models/*.pkl
-!models/*.json
+!knowledge/*.txt
 .pytest_cache/
 .coverage
 htmlcov/

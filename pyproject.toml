@@ -5,7 +5,7 @@ description = "Single-transaction fraud detection crew powered by CrewAI"
 authors = [{ name = "Your Name", email = "you@example.com" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
-    "crewai[tools]==1.9.3",
+    "crewai[litellm,tools]==1.9.3",
     "pandas>=2.3.3",
     "python-dotenv>=1.0.0",
     "scikit-learn>=1.3.0",

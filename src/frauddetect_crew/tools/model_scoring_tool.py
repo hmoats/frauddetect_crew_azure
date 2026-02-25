@@ -7,7 +7,7 @@ import pandas as pd
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
-from frauddetect_crew.paths import MODELS_DIR
+MODELS_DIR = os.path.join(os.path.dirname(__file__), "..", "models")
 
 
 class ModelScoringInput(BaseModel):

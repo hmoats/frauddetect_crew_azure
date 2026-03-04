@@ -2,7 +2,7 @@
 name = "frauddetect_crew"
 version = "0.3.0"
 description = "Single-transaction fraud detection crew powered by CrewAI"
-authors = [{ name = "Your Name", email = "you@example.com" }]
+authors = [{ name = "Tom Haddock" }]
 requires-python = ">=3.10,<3.14"
 dependencies = [
     "crewai[litellm,tools]==1.9.3",

@@ -138,6 +138,7 @@ class FraudDetectCrew:
             max_iter=15,
             max_rpm=30,
             respect_context_window=True,
+            memory=True,
             llm=LLM(model="openai/gpt-4o-mini", temperature=0.1),
         )
 
@@ -150,6 +151,7 @@ class FraudDetectCrew:
             max_iter=10,
             max_rpm=30,
             respect_context_window=True,
+            memory=True,
             llm=LLM(model="openai/gpt-4o-mini", temperature=0.0),
         )
 

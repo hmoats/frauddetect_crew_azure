@@ -44,7 +44,7 @@ TARGET_COLUMN = "Is_Fraud_AML"
 EXCLUDE_PREFIXES = ["Risk_Type"]
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-MODELS_DIR = os.path.join(ROOT_DIR, "models")
+MODELS_DIR = os.path.join(ROOT_DIR, "src", "frauddetect_crew", "models")
 OUTPUT_DIR = os.path.join(ROOT_DIR, "output")
 
 

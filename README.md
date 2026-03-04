@@ -55,20 +55,19 @@ CUSTOMER_ID="63f582f6-e008-4153-8f65-3cb69bddbd3a" crewai run
 fraud_detection_crew/
 ├── src/frauddetect_crew/
 │   ├── main.py          # Entry point (run function)
-│   ├── crew.py          # @CrewBase crew definition
-│   ├── state.py         # FraudVerdict Pydantic output model
+│   ├── crew.py          # @CrewBase crew definition + FraudVerdict output model
 │   ├── config/
 │   │   ├── agents.yaml  # Agent roles, goals, backstories
 │   │   └── tasks.yaml   # Task descriptions + expected outputs
+│   ├── data/
+│   │   └── transactions.csv  # Static transaction records
+│   ├── models/
+│   │   ├── best_model.pkl          # Pre-trained RandomForest
+│   │   ├── feature_columns.json
+│   │   └── model_metrics.json
 │   └── tools/
 │       ├── transaction_lookup_tool.py  # CSV customer lookup
 │       └── model_scoring_tool.py       # Model predict + score
-├── data/
-│   └── transactions.csv # Static transaction records
-├── models/
-│   ├── best_model.pkl   # Pre-trained RandomForest
-│   ├── feature_columns.json
-│   └── model_metrics.json
 ├── scripts/
 │   └── train_model.py   # Offline model retraining (no LLM)
 └── tests/               # 11 unit tests
@@ -82,7 +81,7 @@ The model is trained offline -- no LLM or CrewAI dependency:
 python scripts/train_model.py
 ```
 
-This fetches the dataset from GitHub, trains a RandomForest with GridSearchCV, and writes artifacts to `models/`.
+This fetches the dataset from GitHub, trains a RandomForest with GridSearchCV, and writes artifacts to `src/frauddetect_crew/models/`.
 
 ## Tests
 

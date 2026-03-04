@@ -1,6 +1,6 @@
 """Tests for the FraudVerdict output model."""
 
-from frauddetect_crew.state import FraudVerdict
+from frauddetect_crew.crew import FraudVerdict
 
 
 def test_fraud_verdict_defaults():

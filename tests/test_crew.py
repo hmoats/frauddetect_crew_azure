@@ -1,7 +1,7 @@
 """Smoke tests for the crew configuration."""
 
 from frauddetect_crew.crew import FraudDetectCrew
-from frauddetect_crew.crew import FraudVerdict
+from frauddetect_crew.crew import FraudVerdict, PreliminaryAnalysis
 
 
 def test_crew_instantiation():
@@ -30,8 +30,44 @@ def test_validator_has_tools():
     assert "fraud_model_scorer" in tool_names
 
 
+def test_evaluate_task_has_pydantic_output():
+    """Verify the evaluation task produces PreliminaryAnalysis output."""
+    crew_obj = FraudDetectCrew()
+    task = crew_obj.evaluate_transaction()
+    assert task.output_pydantic == PreliminaryAnalysis
+
+
 def test_validate_task_has_pydantic_output():
     """Verify the validation task produces FraudVerdict output."""
     crew_obj = FraudDetectCrew()
     task = crew_obj.validate_verdict()
     assert task.output_pydantic == FraudVerdict
+
+
+def test_validate_task_has_output_file():
+    """Verify the validation task writes output to a file."""
+    crew_obj = FraudDetectCrew()
+    task = crew_obj.validate_verdict()
+    assert task.output_file == "output/verdict.json"
+
+
+def test_evaluate_task_has_guardrail():
+    """Verify the evaluation task has a guardrail attached."""
+    crew_obj = FraudDetectCrew()
+    task = crew_obj.evaluate_transaction()
+    assert task.guardrail is not None
+
+
+def test_validate_task_has_guardrails():
+    """Verify the validation task has multiple guardrails attached."""
+    crew_obj = FraudDetectCrew()
+    task = crew_obj.validate_verdict()
+    assert task.guardrails is not None
+    assert len(task.guardrails) == 2
+
+
+def test_validate_task_has_callback():
+    """Verify the validation task has a callback attached."""
+    crew_obj = FraudDetectCrew()
+    task = crew_obj.validate_verdict()
+    assert task.callback is not None

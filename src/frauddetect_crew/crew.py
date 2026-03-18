@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from typing import Any, List, Tuple
+import logging
+from typing import Any, List
 
 from crewai import Agent, Crew, Process, Task, LLM, TaskOutput
 from crewai.agents.agent_builder.base_agent import BaseAgent
@@ -12,10 +13,31 @@ from pydantic import BaseModel, Field
 from frauddetect_crew.tools.model_scoring_tool import ModelScoringTool
 from frauddetect_crew.tools.transaction_lookup_tool import TransactionLookupTool
 
+logger = logging.getLogger(__name__)
+
 
 # ---------------------------------------------------------------------------
-# Pydantic output model
+# Pydantic output models
 # ---------------------------------------------------------------------------
+
+class PreliminaryAnalysis(BaseModel):
+    """Structured output from the analyst's initial evaluation."""
+
+    customer_id: str = Field(description="The Customer_ID that was evaluated.")
+    transaction_id: str = Field(default="", description="Transaction_ID from the record.")
+    transaction_amount: float = Field(default=0.0, description="Transaction amount.")
+    merchant_category: str = Field(default="", description="Merchant category.")
+    transaction_type: str = Field(default="", description="Transaction type (Debit, Credit, etc).")
+    account_balance: float = Field(default=0.0, description="Account balance at time of transaction.")
+    city: str = Field(default="", description="City of the customer.")
+    device_type: str = Field(default="", description="Device used for the transaction.")
+    risk_score: float = Field(description="Model probability of fraud, 0.0 to 1.0.")
+    predicted_label: int = Field(description="Model prediction: 0 = legitimate, 1 = fraud.")
+    preliminary_verdict: str = Field(description="FRAUD or APPROVED based on initial analysis.")
+    reasoning: str = Field(
+        description="Evidence-based reasoning referencing the model score and transaction attributes."
+    )
+
 
 class FraudVerdict(BaseModel):
     """Structured output returned to CrewAI Enterprise for every transaction."""
@@ -39,7 +61,51 @@ class FraudVerdict(BaseModel):
 # Guardrail functions
 # ---------------------------------------------------------------------------
 
-def validate_verdict_risk_alignment(result: TaskOutput) -> Tuple[bool, Any]:
+def validate_analysis_has_tool_data(result: TaskOutput):
+    """Ensure the analyst actually used both tools and returned real data."""
+    try:
+        data = json.loads(result.raw) if isinstance(result.raw, str) else {}
+
+        # Check that the analyst retrieved a real customer_id (not empty/placeholder)
+        cid = data.get("customer_id", "")
+        if not cid or cid in ("unknown", "N/A", "placeholder"):
+            return (
+                False,
+                "customer_id is missing or a placeholder. Use the transaction_lookup "
+                "tool to retrieve the real customer record before forming your analysis.",
+            )
+
+        # Check that a risk_score was returned from the model scorer
+        score = data.get("risk_score")
+        if score is None:
+            return (
+                False,
+                "risk_score is missing. Use the fraud_model_scorer tool to score "
+                "the transaction and include the risk_score in your output.",
+            )
+
+        score = float(score)
+        if score < 0 or score > 1:
+            return (
+                False,
+                f"risk_score {score} is outside the valid range [0.0, 1.0]. "
+                "Re-check the fraud_model_scorer output.",
+            )
+
+        # Check that a preliminary verdict was provided
+        verdict = data.get("preliminary_verdict", "").upper().strip()
+        if verdict not in ("FRAUD", "APPROVED"):
+            return (
+                False,
+                f"preliminary_verdict must be 'FRAUD' or 'APPROVED', got '{verdict}'.",
+            )
+
+        return (True, result.raw)
+    except (json.JSONDecodeError, ValueError, TypeError):
+        return (True, result.raw)
+
+
+def validate_verdict_risk_alignment(result: TaskOutput):
     """Reject verdicts that contradict the model risk score."""
     try:
         data = json.loads(result.raw) if isinstance(result.raw, str) else {}
@@ -80,7 +146,7 @@ def validate_verdict_risk_alignment(result: TaskOutput) -> Tuple[bool, Any]:
         return (True, result.raw)
 
 
-def validate_required_fields(result: TaskOutput) -> Tuple[bool, Any]:
+def validate_required_fields(result: TaskOutput):
     """Ensure the verdict contains real, populated data rather than placeholders."""
     try:
         data = json.loads(result.raw) if isinstance(result.raw, str) else {}
@@ -116,6 +182,30 @@ def validate_required_fields(result: TaskOutput) -> Tuple[bool, Any]:
 
 
 # ---------------------------------------------------------------------------
+# Callback functions
+# ---------------------------------------------------------------------------
+
+def log_verdict_completed(output: TaskOutput) -> None:
+    """Log a summary when the final verdict is produced.
+
+    Callbacks run after a task completes successfully (post-guardrail).
+    Unlike guardrails, they do not trigger retries -- they are for
+    side effects like logging, notifications, or metrics.
+    """
+    try:
+        data = json.loads(output.raw) if isinstance(output.raw, str) else {}
+        verdict = data.get("verdict", "UNKNOWN")
+        score = data.get("risk_score", "N/A")
+        cid = data.get("customer_id", "N/A")
+        logger.info(
+            "Verdict complete | customer=%s | verdict=%s | risk_score=%s",
+            cid, verdict, score,
+        )
+    except (json.JSONDecodeError, ValueError, TypeError):
+        logger.warning("Verdict callback: could not parse output.")
+
+
+# ---------------------------------------------------------------------------
 # Crew definition
 # ---------------------------------------------------------------------------
 
@@ -138,7 +228,6 @@ class FraudDetectCrew:
             max_iter=15,
             max_rpm=30,
             respect_context_window=True,
-            memory=True,
             llm=LLM(model="openai/gpt-4o-mini", temperature=0.1),
         )
 
@@ -146,7 +235,7 @@ class FraudDetectCrew:
     def verdict_validator(self) -> Agent:
         return Agent(
             config=self.agents_config["verdict_validator"],  # type: ignore[index]
-            tools=[TransactionLookupTool(), ModelScoringTool()],
+            tools=[],
             verbose=True,
             max_iter=10,
             max_rpm=30,
@@ -159,6 +248,9 @@ class FraudDetectCrew:
     def evaluate_transaction(self) -> Task:
         return Task(
             config=self.tasks_config["evaluate_transaction"],  # type: ignore[index]
+            output_pydantic=PreliminaryAnalysis,
+            guardrail=validate_analysis_has_tool_data,
+            guardrail_max_retries=3,
         )
 
     @task
@@ -166,11 +258,13 @@ class FraudDetectCrew:
         return Task(
             config=self.tasks_config["validate_verdict"],  # type: ignore[index]
             output_pydantic=FraudVerdict,
+            output_file="output/verdict.json",
             guardrails=[
                 validate_required_fields,
                 validate_verdict_risk_alignment,
             ],
             guardrail_max_retries=3,
+            callback=log_verdict_completed,
         )
 
     @crew

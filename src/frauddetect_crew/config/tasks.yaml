@@ -8,16 +8,17 @@ evaluate_transaction:
        fraud_model_scorer tool to get the model's prediction and risk score.
     3. Analyze the model output together with the transaction details (amount,
        merchant category, device, account balance, time of day) to form your verdict.
-    4. Return your analysis including:
-       - The full transaction record fields
-       - The model's risk score and predicted label
-       - Your preliminary verdict (FRAUD or APPROVED) with reasoning
+    4. Return your analysis as a JSON object with ALL of the following fields.
 
     IMPORTANT: Use the REAL data from the tools. Do NOT fabricate any values.
   expected_output: >
-    A detailed analysis containing the transaction record fields, the model risk
-    score, predicted label, and a preliminary FRAUD or APPROVED verdict with
-    evidence-based reasoning.
+    A JSON object with the following fields: customer_id (string), transaction_id
+    (string), transaction_amount (float), merchant_category (string),
+    transaction_type (string), account_balance (float), city (string),
+    device_type (string), risk_score (float, 0.0 to 1.0), predicted_label
+    (int, 0 or 1), preliminary_verdict (string, exactly "FRAUD" or "APPROVED"),
+    and reasoning (string, 2-3 sentences referencing the model score and
+    transaction attributes).
   agent: fraud_analyst
 
 validate_verdict:
@@ -39,10 +40,13 @@ validate_verdict:
     If the analyst's verdict is sound, confirm it. If it needs correction, fix
     the verdict, risk score reasoning, or explanation and explain what you changed.
 
-    Return the final structured FraudVerdict.
+    Return the final structured FraudVerdict as a JSON object.
   expected_output: >
-    A structured FraudVerdict with customer_id, verdict (FRAUD or APPROVED),
-    risk_score, explanation, and key transaction fields.
+    A JSON object with the following fields: customer_id (string), verdict
+    (exactly "FRAUD" or "APPROVED"), risk_score (float, 0.0 to 1.0),
+    explanation (string, 2-3 sentences), transaction_id (string),
+    transaction_amount (float), merchant_category (string), transaction_type
+    (string), account_balance (float), city (string), and device_type (string).
   agent: verdict_validator
   context:
     - evaluate_transaction

@@ -191,6 +191,33 @@ wheels = [
 ]
 
 [[package]]
+name = "azure-ai-inference"
+version = "1.0.0b9"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "azure-core" },
+    { name = "isodate" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4e/6a/ed85592e5c64e08c291992f58b1a94dab6869f28fb0f40fd753dced73ba6/azure_ai_inference-1.0.0b9.tar.gz", hash = "sha256:1feb496bd84b01ee2691befc04358fa25d7c344d8288e99364438859ad7cd5a4", size = 182408, upload-time = "2025-02-15T00:37:28.464Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4f/0f/27520da74769db6e58327d96c98e7b9a07ce686dff582c9a5ec60b03f9dd/azure_ai_inference-1.0.0b9-py3-none-any.whl", hash = "sha256:49823732e674092dad83bb8b0d1b65aa73111fab924d61349eb2a8cdc0493990", size = 124885, upload-time = "2025-02-15T00:37:29.964Z" },
+]
+
+[[package]]
+name = "azure-core"
+version = "1.39.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/34/83/bbde3faa84ddcb8eb0eca4b3ffb3221252281db4ce351300fe248c5c70b1/azure_core-1.39.0.tar.gz", hash = "sha256:8a90a562998dd44ce84597590fff6249701b98c0e8797c95fcdd695b54c35d74", size = 367531, upload-time = "2026-03-19T01:31:29.461Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7e/d6/8ebcd05b01a580f086ac9a97fb9fac65c09a4b012161cc97c21a336e880b/azure_core-1.39.0-py3-none-any.whl", hash = "sha256:4ac7b70fab5438c3f68770649a78daf97833caa83827f91df9c14e0e0ea7d34f", size = 218318, upload-time = "2026-03-19T01:31:31.25Z" },
+]
+
+[[package]]
 name = "backoff"
 version = "2.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -546,6 +573,9 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+azure-ai-inference = [
+    { name = "azure-ai-inference" },
+]
 litellm = [
     { name = "litellm" },
 ]
@@ -752,7 +782,7 @@ name = "frauddetect-crew"
 version = "0.3.0"
 source = { editable = "." }
 dependencies = [
-    { name = "crewai", extra = ["litellm", "tools"] },
+    { name = "crewai", extra = ["azure-ai-inference", "litellm", "tools"] },
     { name = "joblib" },
     { name = "pandas", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "pandas", version = "3.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -768,7 +798,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "crewai", extras = ["litellm", "tools"], specifier = "==1.9.3" },
+    { name = "crewai", extras = ["azure-ai-inference", "litellm", "tools"], specifier = "==1.9.3" },
     { name = "joblib", specifier = ">=1.3.0" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
@@ -1132,6 +1162,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f8/4d/cc37bc2bb0fcd9584f4935ecb5f4b23d33c63ddeea20d899d4d99f72a69a/instructor-1.12.0.tar.gz", hash = "sha256:f0e4dd7f275120f49200df0204af6a2d4e3e2f1f698b6b8c0f776e3a8c977e54", size = 69892486, upload-time = "2025-10-27T18:47:55.191Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b3/8a/af9e30cd9ec64ab595a39996fe761cf2c7ce47475a9607559e3ddf25104a/instructor-1.12.0-py3-none-any.whl", hash = "sha256:88c2161c5ac7ccb60f9b9fc3e93e6a5750a0a28f2927d835b7d198018c3165d9", size = 157906, upload-time = "2025-10-27T18:47:52.007Z" },
+]
+
+[[package]]
+name = "isodate"
+version = "0.7.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/54/4d/e940025e2ce31a8ce1202635910747e5a87cc3a6a6bb2d00973375014749/isodate-0.7.2.tar.gz", hash = "sha256:4cd1aa0f43ca76f4a6c6c0292a85f40b35ec2e43e315b59f06e6d32171a953e6", size = 29705, upload-time = "2024-10-08T23:04:11.5Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/15/aa/0aca39a37d3c7eb941ba736ede56d689e7be91cab5d9ca846bde3999eba6/isodate-0.7.2-py3-none-any.whl", hash = "sha256:28009937d8031054830160fce6d409ed342816b543597cece116d966c6d99e15", size = 22320, upload-time = "2024-10-08T23:04:09.501Z" },
 ]
 
 [[package]]

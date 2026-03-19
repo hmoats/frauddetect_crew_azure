@@ -1,9 +1,8 @@
 from __future__ import annotations
-
+from os import getenv
 import json
 import logging
 from typing import Any, List
-
 from crewai import Agent, Crew, Process, Task, LLM, TaskOutput
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai.knowledge.source.text_file_knowledge_source import TextFileKnowledgeSource
@@ -228,7 +227,12 @@ class FraudDetectCrew:
             max_iter=15,
             max_rpm=30,
             respect_context_window=True,
-            llm=LLM(model="openai/gpt-4o-mini", temperature=0.1),
+            llm=LLM(
+                model=f"azure/{getenv('AZURE_OPENAI_DEPLOYMENT')}",  # deployment name, not base model
+                temperature=0.1,
+                use_native=False,  # <- force LiteLLM backend
+            )
+
         )
 
     @agent
@@ -241,7 +245,12 @@ class FraudDetectCrew:
             max_rpm=30,
             respect_context_window=True,
             memory=True,
-            llm=LLM(model="openai/gpt-4o-mini", temperature=0.0),
+            llm=LLM(
+                model=f"azure/{getenv('AZURE_OPENAI_DEPLOYMENT')}",
+                temperature=0.0,
+                use_native=False,
+            )
+
         )
 
     @task
@@ -282,7 +291,13 @@ class FraudDetectCrew:
             memory=True,
             knowledge_sources=[fraud_policy],
             embedder={
-                "provider": "openai",
-                "config": {"model_name": "text-embedding-3-small"},
-            },
+                "provider": "azure",
+                "config": {
+                    "deployment_id": "text-embedding-3-small",
+                    "model": "text-embedding-3-small",
+                    "api_base": getenv("AZURE_OPENAI_ENDPOINT"),
+                    "api_key": getenv("AZURE_OPENAI_API_KEY"),
+                    "api_version": getenv("AZURE_OPENAI_EMBED_API_VERSION")
+                }
+            }
         )
